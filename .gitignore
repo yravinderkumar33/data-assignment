@@ -1,0 +1,5 @@
+**/.idea
+**/out
+**/target/*
+jars/spark/*
+jars/flink/*

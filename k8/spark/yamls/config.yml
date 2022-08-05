@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global
+data:
+    SPARK_RPC_AUTHENTICATION_ENABLED: "no"
+    SPARK_RPC_ENCRYPTION_ENABLED: "no"
+    SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
+    SPARK_SSL_ENABLED: "no"
+    SPARK_WORKER_MEMORY: "4G"
+    SPARK_WORKER_CORES: "2"
+    KAFKA_URL: "kafka-service:9092"
+    KAFKA_TOPIC_NAME: "telemetry"
+    SPARK_MASTER_URL: spark://spark-master-service:7077
+

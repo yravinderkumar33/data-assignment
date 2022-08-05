@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-master-deployment
+  labels:
+    app: spark-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-master
+  template:
+    metadata:
+      labels:
+        app: spark-master
+    spec:
+      containers:
+        - name: spark-master
+          image: docker.io/bitnami/spark:3.0.2
+          volumeMounts:
+            - mountPath: /opt/spark-jars
+              name: jars
+            - mountPath: /opt/spark-data
+              name: source-data
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+            - containerPort: 4040
+          env:
+            - name: SPARK_MODE
+              value: master  
+            - name: KAFKA_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: KAFKA_URL 
+            - name: KAFKA_TOPIC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: KAFKA_TOPIC_NAME 
+            - name: SPARK_RPC_AUTHENTICATION_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_RPC_AUTHENTICATION_ENABLED
+            - name: SPARK_RPC_ENCRYPTION_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_RPC_ENCRYPTION_ENABLED
+            - name: SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED
+            - name: SPARK_SSL_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_SSL_ENABLED
+      volumes:
+        - name: jars
+          hostPath:
+          # mounting the path to all jar files
+            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/jars/spark
+            type: Directory
+        - name: source-data
+          hostPath:
+          # mounting the path to all the source files for the spark job
+            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/sourceData
+            type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-master-service
+spec:
+  selector:
+    app: spark-master
+  ports:
+    - protocol: TCP
+      name: spark-ui-port
+      port: 8080
+      targetPort: 8080
+    - protocol: TCP
+      name: spark-ui-port-2
+      port: 4040
+      targetPort: 4040
+    - protocol: TCP
+      name: spark-master-port
+      port: 7077
+      targetPort: 7077

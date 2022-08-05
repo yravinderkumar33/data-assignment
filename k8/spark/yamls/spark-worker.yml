@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker-deployment
+  labels:
+    app: spark-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-worker
+  template:
+    metadata:
+      labels:
+        app: spark-worker
+    spec:
+      containers:
+        - name: spark-worker
+          image: docker.io/bitnami/spark:3.0.2
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - mountPath: /opt/spark-jars
+              name: jars
+            - mountPath: /opt/spark-data
+              name: source-data
+          env:
+            - name: SPARK_MODE
+              value: worker
+            - name: KAFKA_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: KAFKA_URL  
+            - name: KAFKA_TOPIC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: KAFKA_TOPIC_NAME
+            - name: SPARK_WORKER_MEMORY
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_WORKER_MEMORY
+            - name: SPARK_MASTER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_MASTER_URL
+            - name: SPARK_RPC_AUTHENTICATION_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_RPC_AUTHENTICATION_ENABLED
+            - name: SPARK_RPC_ENCRYPTION_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_RPC_ENCRYPTION_ENABLED
+            - name: SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED
+            - name: SPARK_SSL_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: global
+                  key: SPARK_SSL_ENABLED
+      volumes:
+        - name: jars
+          hostPath:
+          # source path to the jar file
+            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/jars/spark
+            type: Directory
+        - name: source-data
+          hostPath:
+            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/sourceData
+            type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-worker-service
+spec:
+  selector:
+    app: spark-worker
+  ports:
+    - protocol: TCP
+      name: spark-worker-port
+      port: 8081
+      targetPort: 8081
