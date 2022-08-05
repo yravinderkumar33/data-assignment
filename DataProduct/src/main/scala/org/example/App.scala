@@ -3,6 +3,8 @@ package org.example
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+import scala.util.{Failure, Success, Try}
+
 object App {
 
   val sparkConfig: Map[String, String] = Map("spark.master" -> "local[*]");
@@ -55,9 +57,9 @@ object App {
   def main(args: Array[String]): Unit = {
     val folderPath = args(0);
 
-    val numPartitions = args(1) match {
-      case value => value.toInt
-      case _ => 2
+    val numPartitions = Try(args(1)) match {
+      case Success(value) => value.toInt
+      case Failure(_) => 2
     }
 
     if (folderPath == null) {
