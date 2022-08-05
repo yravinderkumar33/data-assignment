@@ -6,8 +6,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object App {
 
   val sparkConfig: Map[String, String] = Map("spark.master" -> "local[*]");
-  val readConfig = (path: String) => Map(("inferSchema" -> "true"), ("path" -> path), ("compression", "gzip"));
-  val kafkaConfig = Map(("kafka.bootstrap.servers" -> sys.env("KAFKA_URL")), ("topic" -> "telemetry"));
+  val readConfig = (path: String) => Map("inferSchema" -> "true", "path" -> path, "compression" -> "gzip");
+  val kafkaConfig = Map("kafka.bootstrap.servers" -> sys.env("KAFKA_URL"), "topic" -> sys.env("KAFKA_TOPIC_NAME"));
 
   /*
   * Util functions start
@@ -18,47 +18,47 @@ object App {
   val lastEventTimestamp = last("ets") as "end_time";
   val getTimeDiff = abs(expr("last(ets) - first(ets)")) as "time_diff";
 
-  val envToCount = struct(expr("env"), expr("count(env) as count"), getTimeDiff as "time_spent") as "envToCount"
-  val eidToCount = struct(expr("eid as id"), expr("count(*) as count")) as "eidToCount"
+  val envToCountExpr = struct(expr("env"), expr("count(env) as count"), getTimeDiff as "time_spent") as "envToCount"
+  val eidToCountExpr = struct(expr("eid as id"), expr("count(*) as count")) as "eidToCount"
 
-  val Dimension = struct(
+  val PDataExpr = struct(first("context.pdata.id") as "id", first("context.pdata.ver") as "ver") as "pdata";
+
+  val DimensionExpr = struct(
     first("sid") as "sid",
     first("did") as "did",
     first("context.channel") as "channel",
     first("edata.type") as "type",
     first("edata.mode") as "mode",
-    struct(
-      first("context.pdata.id") as "id",
-      first("context.pdata.ver") as "ver"
-    ) as "pdata"
+    PDataExpr
   ) as "dimensions";
 
-  val WorkflowSummarizerPData = struct(
+  val WorkflowSummarizerPDataExpr = struct(
     lit("AnalyticsDataPipeline") as "id",
     lit("WorkflowSummarizer") as "mod",
     lit("1.0") as "ver"
   ) as "pdata";
 
-  val Context = struct(lit("SESSION") as "granularity", WorkflowSummarizerPData);
+  val ContextExpr = struct(lit("SESSION") as "granularity", WorkflowSummarizerPDataExpr);
 
-  val EData = struct(
-    struct(
-      expr("env_summary"),
-      expr("events_summary"),
-      expr("interact_events_count"),
-      expr("start_time"),
-      expr("end_time"),
-      expr("time_diff")
-    ) as "eks"
+  val EksExpr = struct(
+    expr("env_summary"),
+    expr("events_summary"),
+    expr("interact_events_count"),
+    expr("start_time"),
+    expr("end_time"),
+    expr("time_diff")
   );
 
-  /*
-   * Util functions end
-  * */
+  val EDataExpr = struct(EksExpr as "eks");
 
   // main function - Arguements - Folder Path
   def main(args: Array[String]): Unit = {
     val folderPath = args(0);
+
+    val numPartitions = args(1) match {
+      case value => value.toInt
+      case _ => 2
+    }
 
     if (folderPath == null) {
       println("Invalid Arguments.")
@@ -66,14 +66,15 @@ object App {
     }
 
     val sparkSession: SparkSession = SparkScala.getSparkSession(appName = "assignment", config = sparkConfig);
-    SparkScala.registerUDFS(sparkSession);
 
+    // register UDF functions with the spark session.
+    SparkScala.registerUDFS(sparkSession);
     try {
       //read Df
       val telemetryDf = SparkScala.readFile(sparkSession, "json", options = readConfig(folderPath))
       //transformation
-      val workFlowSummarizerDf = processTelemetryDf(telemetryDf);
-      //action - write to kafka queque.
+      val workFlowSummarizerDf = processTelemetryDf(telemetryDf, numPartitions);
+      //action - write to kafka.
       SparkScala.writeDf(workFlowSummarizerDf.selectExpr("to_json(struct(*)) as value"), "kafka", kafkaConfig);
       // close spark session.
       sparkSession.close();
@@ -82,48 +83,46 @@ object App {
     }
   }
 
-  def processTelemetryDf(telemetryDataFrame: DataFrame): DataFrame = {
+  def processTelemetryDf(telemetryDataFrame: DataFrame, numPartitions: Int): DataFrame = {
 
-    val flattenedDf = telemetryDataFrame
-      .selectExpr("*", "context.env as env", "context.did as did", "context.sid as sid", "context.channel as channel")
-      .filter(filterPredicate)
-      .sort(col("ets"))
+    val flattenedDf = telemetryDataFrame.selectExpr("*", "context.env as env", "context.did as did", "context.sid as sid", "context.channel as channel");
+    val filteredDf = flattenedDf.filter(filterPredicate);
+    val sortedByEtsDf = filteredDf.sort(col("ets")).cache();
 
     // events Summary grouped by did and sid
-    val eventsSummary = flattenedDf
+    val eventsSummary = sortedByEtsDf
       .groupBy(expr("did"), expr("sid"), expr("eid"))
-      .agg(eidToCount)
+      .agg(eidToCountExpr)
       .groupBy("did", "sid")
       .agg(collect_list("eidToCount") as "events_summary")
       .withColumn("interact_events_count", expr("interactEventsCount(events_summary)"))
-      .repartition(2)
+      .repartition(numPartitions)
 
     // env Summary grouped by did and sid
-    val envSummaryDf = flattenedDf
+    val envSummaryDf = sortedByEtsDf
       .groupBy(expr("did"), expr("sid"), expr("env"))
-      .agg(envToCount)
+      .agg(envToCountExpr)
       .groupBy("did", "sid")
       .agg(collect_list("envToCount") as "env_summary")
-      .repartition(2)
+      .repartition(numPartitions)
 
     // details about the first event grouped by did and sid
-    val firstEventDetailsDf = flattenedDf.
+    val firstEventDetailsDf = sortedByEtsDf.
       groupBy("did", "sid")
-      .agg(firstEventTimestamp, lastEventTimestamp, getTimeDiff, Dimension, first("object") as "object")
-      .repartition(2)
-
-    val columnsToJoin = Seq("did", "sid");
+      .agg(firstEventTimestamp, lastEventTimestamp, getTimeDiff, DimensionExpr, first("object") as "object")
+      .repartition(numPartitions)
 
     // joining the previous columns
+    val columnsToJoin = Seq("did", "sid");
     val WorkFlowSummarizer = eventsSummary
       .join(envSummaryDf, columnsToJoin, "inner")
       .join(firstEventDetailsDf, columnsToJoin, "inner")
-      .withColumn("edata", EData)
+      .withColumn("edata", EDataExpr)
       .selectExpr("did", "sid", "edata", "dimensions")
       .withColumn("eid", lit("ME_WORKFLOW_SUMMARY"))
       .withColumn("ets", current_timestamp())
-      .withColumn("context", Context)
-      .repartition(2)
+      .withColumn("context", ContextExpr)
+      .repartition(numPartitions)
 
     WorkFlowSummarizer;
   }

@@ -30,7 +30,6 @@ object SparkScala {
 
   // write a df as per the given options and format
   def writeDf(df: DataFrame, format: String, options: Map[String, String]): Unit = {
-    println(options);
     df
       .write
       .format(format)
