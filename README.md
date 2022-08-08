@@ -6,6 +6,9 @@
 Commands
 
 
+![Alt text](Resources/images/flow.png?raw=true "Title")
+
+
 ## Submitting the Spark job
 
 Using Rest API exposed by Apache Ivy
