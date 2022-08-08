@@ -10,7 +10,7 @@ object App {
   val sparkConfig: Map[String, String] = Map("spark.master" -> "local[*]");
   val readConfig = (path: String) => Map("inferSchema" -> "true", "path" -> path, "compression" -> "gzip");
   val kafkaConfig = Map("kafka.bootstrap.servers" -> sys.env("KAFKA_URL"), "topic" -> sys.env("KAFKA_TOPIC_NAME"));
-
+  val defaultArgs = Map("numPartitions" -> 1);
   /*
   * Util functions start
   * */
@@ -59,7 +59,7 @@ object App {
 
     val numPartitions = Try(args(1)) match {
       case Success(value) => value.toInt
-      case Failure(_) => 2
+      case Failure(_) => defaultArgs.get("numPartitions").get
     }
 
     if (folderPath == null) {

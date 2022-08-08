@@ -1,4 +1,4 @@
-package org.example
+package models
 
 case class Context(granularity: String, pdata: Pdata)
 

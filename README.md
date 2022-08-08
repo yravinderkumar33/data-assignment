@@ -4,6 +4,5 @@ spark-submit --class org.example.App --packages org.apache.spark:spark-sql-kafka
 
 
 Steps
-1 - DataProduct - build the FAT Jar and copy to jars/spark folder
-2-  Flink-job - build the FAT Jar and copy to jars/flink folder
-
+1 - DataProduct - build the FAT Jar and copy to jars/spark folder.
+2-  Flink-job - build the FAT Jar and copy to jars/flink folder.
