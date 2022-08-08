@@ -7,7 +7,11 @@ CopyJarFiles() {
 
 Build() {
     CopyJarFiles
-    # Deploy the K8 objects 
+
+    # build the spark image along with Apache Livy
+    docker image build -t yravinderkumar33/livy ./k8/spark/livy
+
+    # Deploy the K8 objects
     kubectl apply  -f ./k8/flink/yamls
     kubectl apply -f ./k8/spark/yamls
     kubectl apply -f ./k8/kafka/yamls
@@ -15,7 +19,6 @@ Build() {
 
 # destorys all the objects for the current namespace
 Destory() {
-    # for local dev
     kubectl delete all --all
 }
 
