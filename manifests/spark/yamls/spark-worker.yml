@@ -23,8 +23,6 @@ spec:
           ports:
             - containerPort: 8081
           volumeMounts:
-            # - mountPath: /opt/spark-jars
-            #   name: jars
             - mountPath: /opt/spark-data
               name: source-data
           env:
@@ -71,11 +69,6 @@ spec:
                   name: global
                   key: SPARK_SSL_ENABLED
       volumes:
-        # - name: jars
-        #   hostPath:
-        #   # source path to the jar file
-        #     path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/jars/spark
-        #     type: Directory
         - name: source-data
           hostPath:
             path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/sourceData

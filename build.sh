@@ -2,19 +2,19 @@
 
 CopyJarFiles() {
     cp ./DataProduct/target/*jar-with-dependencies.jar ./jars/spark
-    cp ./flink-job-2/target/*jar-with-dependencies.jar ./jars/flink
+    cp ./FlinkJob/target/*jar-with-dependencies.jar ./jars/flink
 }
 
 Build() {
     CopyJarFiles
 
     # build the spark image along with Apache Livy
-    docker image build -t yravinderkumar33/livy ./k8/spark/livy
+    docker image build -t yravinderkumar33/livy ./manifests/spark/livy
 
     # Deploy the K8 objects
-    kubectl apply  -f ./k8/flink/yamls
-    kubectl apply -f ./k8/spark/yamls
-    kubectl apply -f ./k8/kafka/yamls
+    kubectl apply  -f ./manifests/flink/yamls
+    kubectl apply -f ./manifests/spark/yamls
+    kubectl apply -f ./manifests/kafka/yamls
 }
 
 # destorys all the objects for the current namespace

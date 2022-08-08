@@ -19,12 +19,8 @@ spec:
           command: ["sh", "-c", "/opt/bitnami/livy/bin/livy-server"]
           image: yravinderkumar33/livy
           volumeMounts:
-            # - mountPath: /opt/spark-jars
-            #   name: jars
             - mountPath: /opt/spark-data
               name: source-data
-            - mountPath: /opt/bitnami/livy/conf
-              name: livy-conf
           securityContext:
             allowPrivilegeEscalation: false
             runAsUser: 0
@@ -67,19 +63,10 @@ spec:
                   name: global
                   key: SPARK_SSL_ENABLED
       volumes:
-        # - name: jars
-        #   hostPath:
-        #   # mounting the path to all jar files
-        #     path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/jars/spark
-        #     type: Directory
         - name: source-data
           hostPath:
           # mounting the path to all the source files for the spark job
             path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/sourceData
-            type: Directory
-        - name: livy-conf
-          hostPath:
-            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/k8/spark/livy/conf
             type: Directory
 
 ---

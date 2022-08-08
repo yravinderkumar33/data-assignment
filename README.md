@@ -6,7 +6,7 @@
 Commands
 
 
-![Alt text](Resources/images/flow.png?raw=true "Title")
+![Alt text](resources/images/flow.png?raw=true "Title")
 
 
 ## Submitting the Spark job

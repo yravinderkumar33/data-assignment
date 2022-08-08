@@ -12,4 +12,6 @@ RUN install_packages unzip \
     && mkdir $LIVY_HOME/logs \
     && chown -R 1001:1001 $LIVY_HOME
 
+COPY ./conf/* /opt/bitnami/livy/conf
+
 USER 1001
