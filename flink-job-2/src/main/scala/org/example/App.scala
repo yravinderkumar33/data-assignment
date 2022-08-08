@@ -8,8 +8,8 @@ import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.scala._
 
 object App {
-  val topicName = "events";
-  val bootstrapServer = "localhost:9092";
+  val topicName = sys.env("KAFKA_TOPIC_NAME");
+  val bootstrapServer = sys.env("KAFKA_URL");
   val groupName = "events-group";
 
   val env = StreamExecutionEnvironment.getExecutionEnvironment
