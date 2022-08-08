@@ -16,12 +16,15 @@ spec:
     spec:
       containers:
         - name: spark-master
-          image: docker.io/bitnami/spark:3.0.2
+          command: ["sh", "-c", "/opt/bitnami/livy/bin/livy-server"]
+          image: yravinderkumar33/livy
           volumeMounts:
-            - mountPath: /opt/spark-jars
-              name: jars
+            # - mountPath: /opt/spark-jars
+            #   name: jars
             - mountPath: /opt/spark-data
               name: source-data
+            - mountPath: /opt/bitnami/livy/conf
+              name: livy-conf
           securityContext:
             allowPrivilegeEscalation: false
             runAsUser: 0
@@ -29,6 +32,7 @@ spec:
             - containerPort: 8080
             - containerPort: 7077
             - containerPort: 4040
+            - containerPort: 8998
           env:
             - name: SPARK_MODE
               value: master  
@@ -63,15 +67,19 @@ spec:
                   name: global
                   key: SPARK_SSL_ENABLED
       volumes:
-        - name: jars
-          hostPath:
-          # mounting the path to all jar files
-            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/jars/spark
-            type: Directory
+        # - name: jars
+        #   hostPath:
+        #   # mounting the path to all jar files
+        #     path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/jars/spark
+        #     type: Directory
         - name: source-data
           hostPath:
           # mounting the path to all the source files for the spark job
             path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/sourceData
+            type: Directory
+        - name: livy-conf
+          hostPath:
+            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/k8/spark/livy/conf
             type: Directory
 
 ---
@@ -80,6 +88,7 @@ kind: Service
 metadata:
   name: spark-master-service
 spec:
+  type: NodePort
   selector:
     app: spark-master
   ports:
@@ -95,3 +104,8 @@ spec:
       name: spark-master-port
       port: 7077
       targetPort: 7077
+    - protocol: TCP
+      name: livy-port
+      port: 8998
+      targetPort: 8998
+      nodePort: 30190
