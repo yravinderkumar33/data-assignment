@@ -71,7 +71,7 @@ spec:
       volumes:
         - name: source-data
           hostPath:
-            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/sourceData
+            path: /Users/ravinderkumar/workspace/sanketika/assignment/Data-pipeline/assets/telemetry
             type: Directory
 
 ---
