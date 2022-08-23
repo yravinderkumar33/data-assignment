@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports: 
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: metadata-data
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          env:
+            - name: POSTGRES_PASSWORD
+              value: FoolishPassword  
+            - name: POSTGRES_USER
+              value: druid
+            - name: POSTGRES_DB
+              value: druid
+      volumes:
+        - name: metadata-data
+          hostPath:
+            path: /private/tmp/data/metadata_data
+            type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      name: postgres-port
+      port: 5432
+      targetPort: 5432

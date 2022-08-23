@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-zookeeper-deployment
+  labels:
+    app: druid-zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-zookeeper
+  template:
+    metadata:
+      labels:
+        app: druid-zookeeper
+    spec:
+      containers:
+        - name: druid-zookeeper
+          image: zookeeper:3.5
+          ports:
+            - containerPort: 2181
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          env:
+            - name: ZOO_MY_ID
+              value: "1"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+spec:
+  selector:
+    app: druid-zookeeper
+  ports:
+    - protocol: TCP
+      name: druid-zookeeper-port
+      port: 2181
+      targetPort: 2181

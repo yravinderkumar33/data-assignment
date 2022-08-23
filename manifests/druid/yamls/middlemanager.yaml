@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-middle-manager-deployment
+  labels:
+    app: druid-middle-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-middle-manager
+  template:
+    metadata:
+      labels:
+        app: druid-middle-manager
+    spec:
+      containers:
+        - name: druid-middle-manager
+          image: apache/druid:0.23.0
+          args:
+            - middleManager
+          volumeMounts:
+            - mountPath: /opt/druid/var
+              name: middle-var
+            - mountPath: /opt/shared
+              name: druid-shared
+          ports:
+            - containerPort: 8091
+            - containerPort: 8100
+            - containerPort: 8101
+            - containerPort: 8102
+            - containerPort: 8103
+            - containerPort: 8104
+            - containerPort: 8105
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          envFrom:
+            - configMapRef:
+                name: 'druid-config'
+      volumes:
+        - name: middle-var
+          hostPath:
+            path: /private/tmp/data/middle_var
+            type: Directory
+        - name: druid-shared
+          hostPath:
+            path: /private/tmp/data/druid_shared
+            type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: middlemanager
+spec:
+  selector:
+    app: druid-middle-manager
+  ports:
+    - protocol: TCP
+      name: druid-middle-manager-port
+      port: 8091
+      targetPort: 8091
+    - protocol: TCP
+      name: middle-manager-0
+      port: 8100
+      targetPort: 8100
+    - protocol: TCP
+      name: middle-manager-1
+      port: 8101
+      targetPort: 8101
+    - protocol: TCP
+      name: middle-manager-2
+      port: 8102
+      targetPort: 8102
+    - protocol: TCP
+      name: middle-manager-3
+      port: 8103
+      targetPort: 8103
+    - protocol: TCP
+      name: middle-manager-4
+      port: 8104
+      targetPort: 8104
+    - protocol: TCP
+      name: middle-manager-5
+      port: 8105
+      targetPort: 8105

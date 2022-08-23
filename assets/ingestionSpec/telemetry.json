@@ -1,0 +1,313 @@
+{
+    "type": "kafka",
+    "dataSchema": {
+        "dataSource": "telemetry-events-2",
+        "parser": {
+            "type": "string",
+            "parseSpec": {
+                "format": "json",
+                "flattenSpec": {
+                    "useFieldDiscovery": false,
+                    "fields": [
+                        {
+                            "type": "root",
+                            "name": "eid"
+                        },
+                        {
+                            "type": "root",
+                            "name": "did"
+                        },
+                        {
+                            "type": "root",
+                            "name": "sid"
+                        },
+                        {
+                            "type": "root",
+                            "name": "ets"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_eks_start_time",
+                            "expr": "$.edata.eks.start_time"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_eks_end_time",
+                            "expr": "$.edata.eks.end_time"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_time_difference",
+                            "expr": "$.edata.eks.time_diff"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_interaction_count",
+                            "expr": "$.edata.eks.interact_events_count"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_env_summary_env",
+                            "expr": "$.edata.eks.env_summary[*].env"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_env_summary_count",
+                            "expr": "$.edata.eks.env_summary[*].count"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_env_summary_time_spent",
+                            "expr": "$.edata.eks.env_summary[*].time_spent"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_eks_events_summary_id",
+                            "expr": "$.edata.eks.events_summary[*].id"
+                        },
+                        {
+                            "type": "path",
+                            "name": "edata_eks_events_summary_count",
+                            "expr": "$.edata.eks.events_summary[*].count"
+                        },
+                        {
+                            "type": "path",
+                            "name": "dimension_channel",
+                            "expr": "$.dimensions.channel"
+                        },
+                        {
+                            "type": "path",
+                            "name": "dimensions_did",
+                            "expr": "$.dimensions.did"
+                        },
+                        {
+                            "type": "path",
+                            "name": "dimensions_pdata_id",
+                            "expr": "$.dimensions.pdata.id"
+                        },
+                        {
+                            "type": "path",
+                            "name": "dimensions_pdata_ver",
+                            "expr": "$.dimensions.pdata.ver"
+                        },
+                        {
+                            "type": "path",
+                            "name": "dimensions_sid",
+                            "expr": "$.dimensions.sid"
+                        },
+                        {
+                            "type": "path",
+                            "name": "dimensions_type",
+                            "expr": "$.dimensions.type"
+                        },
+                        {
+                            "type": "path",
+                            "name": "object_id",
+                            "expr": "$.object.id"
+                        },
+                        {
+                            "type": "path",
+                            "name": "object_type",
+                            "expr": "$.object.type"
+                        },
+                        {
+                            "type": "path",
+                            "name": "object_version",
+                            "expr": "$.object.ver"
+                        },
+                        {
+                            "type": "path",
+                            "name": "object_rollup_l1",
+                            "expr": "$.object.rollup.l1"
+                        },
+                        {
+                            "type": "path",
+                            "name": "object_rollup_l2",
+                            "expr": "$.object.rollup.l2"
+                        },
+                        {
+                            "type": "path",
+                            "name": "object_rollup_l3",
+                            "expr": "$.object.rollup.l3"
+                        },
+                        {
+                            "type": "path",
+                            "name": "object_rollup_l4",
+                            "expr": "$.object.rollup.l4"
+                        },
+                        {
+                            "type": "path",
+                            "name": "context_granularity",
+                            "expr": "$.context.granularity"
+                        },
+                        {
+                            "type": "path",
+                            "name": "context_pdata_id",
+                            "expr": "$.context.pdata.id"
+                        },
+                        {
+                            "type": "path",
+                            "name": "context_pdata_mod",
+                            "expr": "$.context.pdata.mod"
+                        },
+                        {
+                            "type": "path",
+                            "name": "context_pdata_ver",
+                            "expr": "$.context.pdata.ver"
+                        }
+                    ]
+                },
+                "dimensionsSpec": {
+                    "dimensions": [
+                        {
+                            "type": "string",
+                            "name": "eid"
+                        },
+                        {
+                            "type": "string",
+                            "name": "did"
+                        },
+                        {
+                            "type": "string",
+                            "name": "sid"
+                        },
+                        {
+                            "type": "string",
+                            "name": "ets"
+                        },
+                        {
+                            "type": "string",
+                            "name": "edata_eks_start_time"
+                        },
+                        {
+                            "type": "string",
+                            "name": "edata_eks_end_time"
+                        },
+                        {
+                            "type": "string",
+                            "name": "edata_interaction_count"
+                        },
+                        {
+                            "type": "string",
+                            "name": "edata_env_summary_env"
+                        },
+                        {
+                            "type": "string",
+                            "name": "edata_env_summary_count"
+                        },
+                        {
+                            "type": "string",
+                            "name": "dimension_channel"
+                        },
+                        {
+                            "type": "string",
+                            "name": "dimensions_did"
+                        },
+                        {
+                            "type": "string",
+                            "name": "dimensions_pdata_id"
+                        },
+                        {
+                            "type": "string",
+                            "name": "dimensions_pdata_ver"
+                        },
+                        {
+                            "type": "string",
+                            "name": "dimensions_sid"
+                        },
+                        {
+                            "type": "string",
+                            "name": "dimensions_type"
+                        },
+                        {
+                            "type": "string",
+                            "name": "object_id"
+                        },
+                        {
+                            "type": "string",
+                            "name": "object_type"
+                        },
+                        {
+                            "type": "string",
+                            "name": "object_version"
+                        },
+                        {
+                            "type": "string",
+                            "name": "object_rollup_l1"
+                        },
+                        {
+                            "type": "string",
+                            "name": "object_rollup_l2"
+                        },
+                        {
+                            "type": "string",
+                            "name": "object_rollup_l3"
+                        },
+                        {
+                            "type": "string",
+                            "name": "object_rollup_l4"
+                        },
+                        {
+                            "name": "tags"
+                        },
+                        {
+                            "type": "double",
+                            "name": "edata_time_spent"
+                        },
+                        {
+                            "type": "double",
+                            "name": "edata_time_difference"
+                        },
+                        {
+                            "type": "string",
+                            "name": "edata_env_summary_time_spent"
+                        },
+                        {
+                            "type": "string",
+                            "name": "context_granularity"
+                        },
+                        {
+                            "type": "string",
+                            "name": "context_pdata_id"
+                        },
+                        {
+                            "type": "string",
+                            "name": "context_pdata_mod"
+                        },
+                        {
+                            "type": "string",
+                            "name": "context_pdata_ver"
+                        }
+                    ],
+                    "dimensionsExclusions": []
+                },
+                "timestampSpec": {
+                    "column": "ets",
+                    "format": "auto"
+                }
+            }
+        },
+        "metricsSpec": [],
+        "granularitySpec": {
+            "type": "uniform",
+            "segmentGranularity": "day",
+            "rollup": true
+        }
+    },
+    "ioConfig": {
+        "topic": "telemetry",
+        "consumerProperties": {
+            "bootstrap.servers": "kafka-service:9092"
+        },
+        "taskCount": 1,
+        "replicas": 1,
+        "taskDuration": "PT14400S",
+        "useEarliestOffset": true,
+        "completionTimeout": "PT1800S"
+    },
+    "tuningConfig": {
+        "type": "kafka",
+        "reportParseExceptions": false,
+        "maxRowsPerSegment": 5000000
+    }
+}

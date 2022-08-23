@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-broker-deployment
+  labels:
+    app: druid-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-broker
+  template:
+    metadata:
+      labels:
+        app: druid-broker
+    spec:
+      containers:
+        - name: druid-broker
+          image: apache/druid:0.23.0
+          args:
+            - broker
+          volumeMounts:
+            - mountPath: /opt/druid/var
+              name: broker-var
+          ports:
+            - containerPort: 8082
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          envFrom:
+            - configMapRef:
+                name: 'druid-config'
+      volumes:
+        - name: broker-var
+          hostPath:
+            path: /private/tmp/data/broker_var
+            type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker
+spec:
+  selector:
+    app: druid-broker
+  ports:
+    - protocol: TCP
+      name: druid-broker-port
+      port: 8082
+      targetPort: 8082

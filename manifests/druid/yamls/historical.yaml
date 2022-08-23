@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-historical-deployment
+  labels:
+    app: druid-historical
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-historical
+  template:
+    metadata:
+      labels:
+        app: druid-historical
+    spec:
+      containers:
+        - name: druid-historical
+          image: apache/druid:0.23.0
+          args:
+            - historical
+          volumeMounts:
+            - mountPath: /opt/shared
+              name: druid-shared
+            - mountPath: /opt/druid/var
+              name: historical-var
+          ports:
+            - containerPort: 8083
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
+          envFrom:
+            - configMapRef:
+                name: 'druid-config'
+      volumes:
+        - name: historical-var
+          hostPath:
+            path: /private/tmp/data/historical_var
+            type: Directory
+        - name: druid-shared
+          hostPath:
+            path: /private/tmp/data/druid_shared
+            type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: historical
+spec:
+  selector:
+    app: druid-historical
+  ports:
+    - protocol: TCP
+      name: druid-historical-port
+      port: 8083
+      targetPort: 8083
