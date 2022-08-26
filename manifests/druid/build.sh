@@ -1,3 +1,4 @@
+rm -rf /private/tmp/data
 mkdir /private/tmp/data
 mkdir /private/tmp/data/broker_var
 mkdir /private/tmp/data/coordinator_var

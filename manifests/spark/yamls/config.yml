@@ -11,5 +11,5 @@ data:
     SPARK_WORKER_CORES: "2"
     KAFKA_URL: "kafka-service:9092"
     KAFKA_TOPIC_NAME: "telemetry"
-    SPARK_MASTER_URL: spark://spark-master-service:7077
+    SPARK_MASTER_URL: "spark://spark-master-service:7077"
 
