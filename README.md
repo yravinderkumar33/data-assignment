@@ -1,3 +1,4 @@
+#Workflow Summarizer on Sunbird Telemetry Data
 ## Technologies Used
 - Scala 3
 - Apache Spark
@@ -7,7 +8,7 @@
 - Kubernetes with Docker as Runtime
 - Apache Druid
 - Apache Zookeeper
-- Maven
+- Apache Maven
 
 # How to Run :- 
 - Build the Fat Jar for the spark job (`mvn package`)
