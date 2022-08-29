@@ -1,4 +1,15 @@
-# Deployment Steps - 
+## Technologies Used
+- Scala 3
+- Apache Spark
+- Apache Flink
+- Apache Kafka
+- Apache Livy for Spark job Submission
+- Kubernetes with Docker as Runtime
+- Apache Druid
+- Apache Zookeeper
+- Maven
+
+# How to Run :- 
 - Build the Fat Jar for the spark job (`mvn package`)
 - Build the Fat Jar for the flink job (`mvn package`)
 - ./build.sh to Deploy the cluster

@@ -16,7 +16,6 @@ spec:
     spec:
       containers:
         - name: spark-master
-          command: ["sh", "-c", "/opt/bitnami/livy/bin/livy-server"]
           image: yravinderkumar33/livy
           volumeMounts:
             - mountPath: /opt/spark-data

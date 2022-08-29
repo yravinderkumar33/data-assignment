@@ -14,4 +14,7 @@ RUN install_packages unzip \
 
 COPY ./conf/* /opt/bitnami/livy/conf
 
+RUN cd /opt/bitnami/livy/bin && ./livy-server start
+WORKDIR /opt/bitnami/
+
 USER 1001

@@ -17,6 +17,7 @@ Build() {
     kubectl apply  -f ./manifests/flink/yamls
     kubectl apply -f ./manifests/spark/yamls
     kubectl apply -f ./manifests/druid/yamls
+    helm install superset ./manifests/superset
 }
 
 # destorys all the objects for the current namespace
