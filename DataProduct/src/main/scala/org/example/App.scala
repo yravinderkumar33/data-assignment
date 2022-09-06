@@ -7,7 +7,9 @@ import scala.util.{Failure, Success, Try}
 
 object App {
 
-  val sparkConfig: Map[String, String] = Map("spark.master" -> "local[*]");
+  val sparkConfig: Map[String, String] = Map(
+    "spark.master" -> "spark://spark-master-service:7077"
+    );
   val readConfig = (path: String) => Map("inferSchema" -> "true", "path" -> path, "compression" -> "gzip");
   val kafkaConfig = Map("kafka.bootstrap.servers" -> sys.env("KAFKA_URL"), "topic" -> sys.env("KAFKA_TOPIC_NAME"));
   val defaultArgs = Map("numPartitions" -> 1);
